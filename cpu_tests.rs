@@ -1,3 +1,16 @@
+fn make_opcode(base_selector: u8, offset: u8) -> u16 {
+    let base_bits = (base_selector as u16) << 8; // bits 8–9
+    base_bits | offset as u16
+}
+
+fn expected_base_index(opcode: u16) -> usize {
+    ((opcode & 0x0300) >> 8) as usize
+}
+
+fn expected_addr(opcode: u16, base_regs: [u16; 4]) -> u16 {
+    let base_idx = expected_base_index(opcode);
+    base_regs[base_idx].wrapping_add((opcode & 0xFF) as u16)
+}
 #[test]
 fn test_ex_lb_all_bases_and_offsets() {
     unsafe {
@@ -20,15 +33,7 @@ fn test_ex_lb_all_bases_and_offsets() {
     }
 }
 //--------
-fn make_opcode(base: u8, offset: u8) -> u16 {
-    ((base as u16) << 8) | (offset as u16)
-}
 
-fn expected_addr(opcode: u16) -> u16 {
-    let base = (opcode >> 8) & 0xFF;
-    let offset = opcode & 0xFF;
-    base + offset
-}
 #[test]
 fn test_ex_dlb_exhaustive_base_and_offset_combinations() {
     unsafe {
