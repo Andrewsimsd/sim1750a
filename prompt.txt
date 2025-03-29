@@ -1,5 +1,5 @@
 I have this function in C 
-<my_function>
+<function_to_test>
 static int
 ex_ab ()		/* 1[0-3]xy */
 {
@@ -12,9 +12,9 @@ ex_ab ()		/* 1[0-3]xy */
   simreg.ic++;
   return (nc_AB);
 }
-</my_function>
-I have a rust function that calls the previous function through an FFI. Write me unit tests in rust to exhaustively exercise all code paths of the C function.  Include messages when tests fail in the assert. Use the term idempotency to describe determinism over repeated calls. Include tests for edge cases and idempotency. Be very thorough as a very experienced, professional software engineer would be. Consider your response before responding. I have the following helper functions that can and should be used to help arrange the tests where applicable:
-<my_rust_helper_functions>
+</function_to_test>
+I have a rust function that calls the previous function through an FFI. Write me unit tests in rust to exhaustively exercise all code paths of the C function.  Include messages when tests fail in the assert. Use the term idempotency to describe determinism over repeated calls. Include tests for edge cases and idempotency. Be very thorough as a very experienced, professional software engineer would be. Consider your response before responding. Consider that the registers used for this test may not be used the same in future tests. Because of this, make all helper functions that you generate flexible. I have the following helper functions that can and should be used to help arrange the tests where applicable:
+<rust_helper_functions>
 pub fn make_opcode(base_selector: u8, offset: u8) -> u16 {
     let base_bits = (base_selector as u16) << 8; // bits 8–9
     base_bits | offset as u16
@@ -24,7 +24,7 @@ fn expected_base_index(opcode: u16) -> usize {
     ((opcode & 0x0300) >> 8) as usize
 }
 
-pub fn expected_addr(opcode: u16, base_regs: [u16; 4]) -> u16 {
+pub fn expected_addr(opcode: u16) -> u16 {
     unsafe{
         let base_idx = expected_base_index(opcode);
         c_types::simreg.r[base_idx].wrapping_add((opcode & 0xFF) as i16) as u16
@@ -35,7 +35,7 @@ pub unsafe fn set_memory_value(page: u16, addres: u16, value: u16){
     c_types::memoryBank.memPage[page as usize].memData[address as usize] = value;
     c_types::memoryBank.memPage[page as usize].wasWritten[address as usize] = 1;
 }
-</my_rust_helper_functions>
+</rust_helper_functions>
 The following are some things defined in the C code that might be relevant:
 <C_definitions>
 #define BASEREG(opcode) (ushort) simreg.r[12 + (((opcode) & 0x0300) >> 8)]
@@ -56,3 +56,4 @@ struct simreg
     ushort sys;    /* system configuration register */
   };
 </simreg_definition>
+
