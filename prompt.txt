@@ -1,16 +1,16 @@
 I have this function in C 
 <function_to_test>
 static int
-ex_sbb ()		/* 1[4-7]xy */
+ex_mb ()		/* 1[8-B]xy */
 {
   ushort addr = BASEREG (opcode) + (opcode & 0xFF);
   short help;
 
   GET (DATA, addr, &help);
-  arith (ARI_SUB, VAR_INT, &simreg.r[2], &help);
+  arith (ARI_MUL, VAR_INT, &simreg.r[2], &help);
 
   simreg.ic++;
-  return (nc_SBB);
+  return (nc_MB);
 }
 </function_to_test>
 I have a rust function that calls the previous function through an FFI. Write me unit tests in rust to exhaustively exercise all code paths of the C function.  Include messages when tests fail in the assert. Use the term idempotency to describe determinism over repeated calls. Include tests for edge cases and idempotency. Be very thorough as a very experienced, professional software engineer would be. Consider your response before responding. Consider that the registers used for this test may not be used the same in future tests. Because of this, make all helper functions that you generate flexible. I have the following helper functions that can and should be used to help arrange the tests where applicable:
